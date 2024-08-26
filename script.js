@@ -39,14 +39,14 @@ function bfs(matriz, inicio, final)
 
             if(newX >= 0 && newX < linhas && newY >= 0 && newY < colunas && !visitados[newX][newY] && matriz[newX][newY] === 0)
             {
-                visitados[newX, newY] = true; // marcar como visitado
+                visitados[newX][newY] = true; // marcar como visitado
 
                 fila.push({posicao: [newX, newY], caminho: [...caminho,[newX, newY]]})
             }
         }
     }
 
-    return []; // se nao achar o caminho
+    return 0; // se nao achar o caminho
 }
 
 const matriz = 
@@ -63,27 +63,113 @@ const final = [4, 4];
 
 const caminho = bfs(matriz, inicio, final);
 
+if (caminho !== 0)
+{
+    caminho.forEach(row => 
+    {
+        matriz[row[0]][row[1]] = 3; // marca o caminho como 3
+    });
+}
+
+// marca o inicio e o final
+matriz[inicio[0]][inicio[1]] = 2; 
+matriz[final[0]][final[1]] = 4;
+
 const table = document.getElementById('matrizTable');
 
-// Função para gerar a tabela
 function gerarTabela(matriz) 
 {
-    // Adiciona as linhas à tabela
-    matriz.forEach(row => 
+    table.innerHTML = '';
+    matriz.forEach((row, rowIndex) => 
     {
         const tr = document.createElement('tr');
-        // Adiciona as células à linha
-        row.forEach(cell => 
+
+        row.forEach((cell, colIndex) => 
         {
             const td = document.createElement('td');
-            td.textContent = cell;
+
+            td.id = `celula-${rowIndex}-${colIndex}`; // da um id baseado na posicao
+
+            if(cell === 1)
+            {
+                td.classList.add('parede');
+            }
+            else if (cell === 2)
+            {
+                td.classList.add('inicio');
+            }
+            else if (cell === 3)
+            {
+                td.classList.add('caminho');
+                td.textContent = 'X'
+            }
+            else if (cell === 4)
+            {
+                td.classList.add('final');
+            }
+            else
+            {
+                td.classList.add('vazio');
+            }
+
+            td.addEventListener('click', () =>
+            {
+                // inverte ao clicar e seta o novo valor na matriz
+                if (matriz[rowIndex][colIndex] === 0)
+                {
+                    matriz[rowIndex][colIndex] = 1;
+                    td.classList.remove('vazio');
+                    td.classList.add('parede');
+                }
+                else if (matriz[rowIndex][colIndex] === 1)
+                {
+                    matriz[rowIndex][colIndex] = 0;
+                    td.classList.remove('parede');
+                    td.classList.add('vazio');
+                }
+                else if (matriz[rowIndex][colIndex] === 3)
+                {
+                    matriz[rowIndex][colIndex] = 1;
+                    td.classList.remove('caminho');
+                    td.classList.add('parede');
+                }
+
+                // remove os caminhos antigos
+                for (let i = 0; i < matriz.length; i++) 
+                {
+                    for (let j = 0; j < matriz[i].length; j++) 
+                    {
+                        if (matriz[i][j] !== 1) 
+                        {
+                            matriz[i][j] = 0;
+                        }
+                    }
+                }
+
+                const novoCaminho = bfs(matriz, inicio, final);
+
+                if (novoCaminho !== 0)
+                {
+                    novoCaminho.forEach(row => 
+                    {
+                        matriz[row[0]][row[1]] = 3; // marca o caminho como 3
+                    });
+                }
+
+                matriz[inicio[0]][inicio[1]] = 2; 
+                matriz[final[0]][final[1]] = 4; 
+
+                gerarTabela(matriz);
+
+                //console.log(novoCaminho);
+                //console.log(matriz);
+            });
+
             tr.appendChild(td);
         });
+        
         table.appendChild(tr);
     });
 }
 
-// Chama a função para gerar a tabela
-gerarTabela(matriz);
-
-console.log(caminho);
+gerarTabela(matriz); // chama a primeira tabela

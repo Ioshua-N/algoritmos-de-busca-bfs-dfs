@@ -18,5 +18,34 @@
 
 td
 {
-    padding: 1rem 2rem;
+    width: 10rem;
+    height: 10rem;
+
+    text-align: center;
+}
+
+.vazio
+{
+    background-color: gray;
+}
+
+.parede
+{
+    background-color: black;
+}
+
+.caminho
+{
+    background-color: blue;
+    color: black;
+}
+
+.inicio
+{
+    background-color: green;
+}
+
+.final
+{
+    background-color: red;
 }
